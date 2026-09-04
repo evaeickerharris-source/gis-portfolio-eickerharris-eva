@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project Title 5</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#f4f1e8;--surface:#f4e2c4;--text:#191919;--muted:#604027;--accent:#6d682c;--accent-light:#ebe2a7;--border:#e5e7eb;--shadow:0 10px 28px rgba(0,0,0,0.06);--radius:20px;--max-width:1150px;}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    html{scroll-behavior:smooth;}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.8;}
+    img{max-width:100%;display:block;}
+    a{text-decoration:none;color:var(--accent);}
+    .container{width:min(92%, var(--max-width));margin:auto;}
+    header{position:sticky;top:0;z-index:1000;background:rgba(255,255,255,0.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);} 
+    nav{display:flex;justify-content:space-between;align-items:center;padding:1rem 0;}
+    .logo{font-weight:700;font-size:1.05rem;}
+    .back-link{color:var(--muted);transition:0.2s ease;}
+    .back-link:hover{color:var(--accent);} 
+    .hero{padding:6rem 0 4rem;}
+    .hero h1{font-family:'Merriweather',serif;font-size:clamp(2.4rem,6vw,4.5rem);line-height:1.15;margin-bottom:1.3rem;}
+    .hero p{color:var(--muted);max-width:800px;font-size:1.1rem;}
+    .hero-meta{margin-top:2rem;display:flex;flex-wrap:wrap;gap:1rem;}
+    .meta-item{background:var(--accent-light);color:var(--accent);padding:0.6rem 1rem;border-radius:999px;font-size:0.92rem;font-weight:500;}
+    .feature-image{height:500px;background:linear-gradient(135deg,#dbeafe,#eff6ff);border-radius:var(--radius);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:#64748b;font-size:1.2rem;font-weight:600;margin-bottom:5rem;box-shadow:var(--shadow);position:relative;} 
+    .map-scale-bar{position:absolute;right:1rem;bottom:1rem;z-index:4;background:rgba(244,241,232,0.95);border:1px solid #9ca3af;border-radius:8px;padding:0.42rem 0.5rem;box-shadow:0 6px 18px rgba(0,0,0,0.12);}
+    .map-scale-track{display:flex;width:110px;height:10px;border:1px solid rgba(0,0,0,0.22);border-radius:2px;overflow:hidden;}
+    .map-scale-seg{flex:1;background:#2f2f2f;}
+    .map-scale-seg-light{background:#f3f4f6;}
+    .map-scale-labels{display:flex;justify-content:space-between;color:#374151;font-size:0.78rem;font-weight:700;line-height:1;margin-top:0.28rem;}
+    section{padding-bottom:4rem;}
+    .content-grid{display:grid;grid-template-columns:2fr 1fr;gap:3rem;align-items:start;}
+    .content-card{background:var(--surface);border-radius:var(--radius);padding:2.2rem;border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:2rem;}
+    .content-card h2{font-family:'Merriweather',serif;margin-bottom:1rem;font-size:1.6rem;}
+    .content-card p{color:var(--muted);margin-bottom:1.2rem;}
+    .content-card ul{padding-left:1.2rem;color:var(--muted);}
+    .sidebar-card{background:var(--surface);border-radius:var(--radius);padding:2rem;border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:2rem;}
+    .sidebar-card h3{margin-bottom:1rem;font-size:1.1rem;}
+    .sidebar-card p{color:var(--muted);margin-bottom:0.7rem;font-size:0.95rem;}
+    .gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;margin-top:2rem;}
+    .gallery-item{height:180px;border-radius:16px;background:linear-gradient(135deg,#e0ecff,#f5f9ff);display:flex;align-items:center;justify-content:center;color:#64748b;font-weight:600;border:1px solid var(--border);} 
+    .button{display:inline-block;margin-top:1rem;padding:0.95rem 1.4rem;border-radius:999px;background:var(--accent);color:white;font-weight:600;transition:0.2s ease;}
+    .button:hover{opacity:0.92;}
+    footer{padding:4rem 0;text-align:center;color:var(--muted);font-size:0.95rem;}
+    @media(max-width:900px){.content-grid{grid-template-columns:1fr;}.feature-image{height:320px;}nav{flex-direction:column;gap:1rem;}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <nav>
+        <div class="logo">GIS Student Portfolio</div>
+        <a href="file:///Users/evaeicker-harris/Downloads/Student_website_template.html" class="back-link">← Back to Portfolio</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <h1>Project Title 5</h1>
+      <p>Write a short professional summary of this project here. Explain the purpose, research question, or sustainability challenge addressed.</p>
+      <div class="hero-meta">
+        <div class="meta-item">GIS Analysis</div>
+        <div class="meta-item">Spatial Modeling</div>
+        <div class="meta-item">Sustainability</div>
+        <div class="meta-item">2026</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="container"><div class="feature-image" id="project6-main-map">MAIN MAP / PROJECT IMAGE<div class="map-scale-bar" aria-label="Map scale bar"><div class="map-scale-track"><span class="map-scale-seg"></span><span class="map-scale-seg map-scale-seg-light"></span></div><div class="map-scale-labels"><span>0</span><span>1 km</span></div></div></div></div>
+
+  <section>
+    <div class="container">
+      <div class="content-grid">
+        <div>
+          <div class="content-card">
+            <h2>Project Overview</h2>
+            <p>Introduce the project in more detail here. Describe the context, motivation, and overall goals of the work.</p>
+            <p>This section can explain:</p>
+            <ul><li>Research objectives</li><li>Study area</li><li>Environmental or social relevance</li><li>Why GIS methods were appropriate</li></ul>
+          </div>
+          <div class="content-card">
+            <h2>Methods</h2>
+            <p>Describe the GIS workflow and methods used.</p>
+            <ul><li>Data collection</li><li>Spatial analysis techniques</li><li>Remote sensing processing</li><li>Cartographic design choices</li><li>Software and tools used</li></ul>
+          </div>
+        </div>
+        <div>
+          <div class="sidebar-card">
+            <h3>Project Details</h3>
+            <p><strong>Student:</strong> Eva Eicker-Harris</p>
+            <p><strong>Instructor:</strong> dr. Britta Ricker</p>
+            <p><strong>Date:</strong> June 2026</p>
+            <p><strong>Study Area:</strong> Aruba</p>
+          </div>
+          <div class="sidebar-card">
+            <h3>Software & Tools</h3>
+            <p>QGIS</p><p>ArcGIS Pro</p><p>Google Earth Engine</p><p>MapLibre GL</p><p>Python</p>
+          </div>
+          <div class="sidebar-card">
+            <h3>Downloads</h3>
+            <a href="project-6-map.pdf" class="button" download data-export-target="#project6-main-map" data-export-filename="project-6-map.pdf">Download Map PDF</a>
+            <br><br>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer><div class="container">© 2026 GIS Student Portfolio</div></footer>
+  <script src="vendor/html2canvas.min.js"></script>
+  <script src="vendor/jspdf.umd.min.js"></script>
+  <script src="map-export.js"></script>
+</body>
+</html>

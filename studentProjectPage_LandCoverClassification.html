@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Land Cover Classification</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#f4f1e8;
+      --surface:#f4e2c4;
+      --text:#191919;
+      --muted:#604027;
+      --accent:#6d682c;
+      --accent-light:#ebe2a7;
+      --border:#e5e7eb;
+      --shadow:0 10px 28px rgba(0,0,0,0.06);
+      --radius:20px;
+      --max-width:1240px;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    html{scroll-behavior:smooth;}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.8;}
+    img{max-width:100%;display:block;}
+    a{text-decoration:none;color:var(--accent);}
+    .container{width:min(92%, var(--max-width));margin:auto;}
+    header{position:sticky;top:0;z-index:1000;background:rgba(244,226,196,0.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);} 
+    nav{display:flex;justify-content:space-between;align-items:center;padding:1rem 0;}
+    .logo{font-weight:700;font-size:1.05rem;}
+    .back-link{color:var(--muted);transition:0.2s ease;}
+    .back-link:hover{color:var(--accent);} 
+    .hero{padding:6rem 0 4rem;}
+    .hero h1{font-family:'Merriweather',serif;font-size:clamp(2.4rem,6vw,4.5rem);line-height:1.15;margin-bottom:1.3rem;}
+    .hero p{color:var(--muted);max-width:800px;font-size:1.1rem;}
+    .hero-meta{margin-top:2rem;display:flex;flex-wrap:wrap;gap:1rem;}
+    .meta-item{background:var(--accent-light);color:var(--accent);padding:0.6rem 1rem;border-radius:999px;font-size:0.92rem;font-weight:500;}
+    .feature-image{margin-bottom:5rem;}
+    .feature-map-wrap{position:relative;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow);background:#f4f1e8;aspect-ratio:1134 / 556;}
+    .feature-map-wrap img{width:100%;height:100%;object-fit:cover;display:block;}
+    .feature-map-title{font-family:'Merriweather',serif;font-size:clamp(0.8rem,1.35vw,1.22rem);line-height:1.2;margin:0;color:var(--text);white-space:nowrap;position:absolute;top:0;left:0;right:0;z-index:3;text-align:center;background:rgba(244,241,232,0.92);border:1px solid #d1d5db;padding:0.58rem 1rem;box-shadow:0 3px 10px rgba(0,0,0,0.08);} 
+    .landcover-legend{position:absolute;left:1rem;bottom:1rem;z-index:3;background:rgba(244,241,232,0.95);border:1px solid #9ca3af;border-radius:8px;padding:0.7rem 0.8rem;box-shadow:0 6px 18px rgba(0,0,0,0.12);min-width:190px;}
+    .landcover-legend h4{margin:0 0 0.45rem;color:#374151;font-size:0.95rem;line-height:1.2;font-weight:700;}
+    .landcover-legend-item{display:flex;align-items:center;gap:0.55rem;color:#374151;font-size:0.9rem;font-weight:600;margin:0.22rem 0;}
+    .landcover-swatch{width:18px;height:18px;border-radius:2px;border:1px solid rgba(0,0,0,0.15);flex:0 0 auto;}
+    .ndvi-legend{position:absolute;left:1rem;bottom:1rem;z-index:3;background:rgba(244,241,232,0.95);border:1px solid #9ca3af;border-radius:8px;padding:0.7rem 0.8rem;box-shadow:0 6px 18px rgba(0,0,0,0.12);}
+    .ndvi-legend h4{margin:0 0 0.45rem;color:#374151;font-size:0.95rem;line-height:1.2;font-weight:700;}
+    .ndvi-scale{display:flex;align-items:stretch;gap:0.55rem;}
+    .ndvi-gradient{width:44px;height:96px;border-radius:2px;border:1px solid rgba(0,0,0,0.15);background:linear-gradient(180deg,#0e9f20 0%, #fff317 52%, #ff4a18 100%);}
+    .ndvi-labels{display:flex;flex-direction:column;justify-content:space-between;color:#374151;font-size:1.9rem;font-weight:600;line-height:1;}
+    .map-scale-bar{position:absolute;right:1rem;bottom:1rem;z-index:4;background:rgba(244,241,232,0.95);border:1px solid #9ca3af;border-radius:8px;padding:0.42rem 0.5rem;box-shadow:0 6px 18px rgba(0,0,0,0.12);}
+    .map-scale-track{display:flex;width:110px;height:10px;border:1px solid rgba(0,0,0,0.22);border-radius:2px;overflow:hidden;}
+    .map-scale-seg{flex:1;background:#2f2f2f;}
+    .map-scale-seg-light{background:#f3f4f6;}
+    .map-scale-labels{display:flex;justify-content:space-between;color:#374151;font-size:0.78rem;font-weight:700;line-height:1;margin-top:0.28rem;}
+    .secondary-map{margin-top:2rem;}
+    .map-overview-tab{margin-top:2rem;}
+    section{padding-bottom:4rem;}
+    .content-grid{display:grid;grid-template-columns:2fr 1fr;gap:3rem;align-items:start;}
+    .content-card{background:var(--surface);border-radius:var(--radius);padding:2.2rem;border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:2rem;}
+    .content-card h2{font-family:'Merriweather',serif;margin-bottom:1rem;font-size:1.6rem;}
+    .content-card p{color:var(--muted);margin-bottom:1.2rem;}
+    .content-card ul{padding-left:1.2rem;color:var(--muted);}
+    .sidebar-card{background:var(--surface);border-radius:var(--radius);padding:2rem;border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:2rem;}
+    .sidebar-card h3{margin-bottom:1rem;font-size:1.1rem;}
+    .sidebar-card p{color:var(--muted);margin-bottom:0.7rem;font-size:0.95rem;}
+    .downloads-list{display:flex;flex-direction:column;gap:0.8rem;}
+    .gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;margin-top:2rem;}
+    .gallery-item{height:180px;border-radius:16px;background:linear-gradient(135deg,#ebe2a7,#f4e2c4);display:flex;align-items:center;justify-content:center;color:#604027;font-weight:600;border:1px solid var(--border);} 
+    .button{display:inline-block;margin-top:0;padding:0.95rem 1.4rem;border-radius:999px;background:#7b7729;color:#ffffff;font-weight:600;transition:0.2s ease;width:fit-content;}
+    .button:hover{background:#676220;}
+    .certificate-panel{padding-top:0;padding-bottom:2rem;}
+    .certificate-wrap{max-width:980px;margin:0 auto;aspect-ratio:4 / 3;background:#ffffff;}
+    .certificate-image{width:100%;height:100%;object-fit:contain;background:#ffffff;}
+    footer{padding:4rem 0;text-align:center;color:var(--muted);font-size:0.95rem;}
+    @media(max-width:900px){.content-grid{grid-template-columns:1fr;}.feature-map-title{white-space:normal;max-width:calc(100% - 1.6rem);}.landcover-legend{position:static;margin:0.8rem;width:calc(100% - 1.6rem);min-width:0;}nav{flex-direction:column;gap:1rem;}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <nav>
+        <div class="logo">GIS Student Portfolio</div>
+        <a href="Student_website_template.html" class="back-link">← Back to Portfolio</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <h1>Land Cover Classification</h1>
+      <p>Write a short professional summary of this project here. Explain the purpose, research question, or sustainability challenge addressed.</p>
+      <div class="hero-meta">
+        <div class="meta-item">ArcGIS Pro</div>
+        <div class="meta-item">Remote Sensing</div>
+        <div class="meta-item">Spatial Analysis</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+    <div class="feature-image">
+      <div class="feature-map-wrap secondary-map" id="landcover-map-ndvi">
+        <h2 class="feature-map-title">NDVI Vegetation Helath Map of Utrecht</h2>
+        <img src="Screenshot 2026-06-24 174700.jpeg" alt="NDVI vegetation health map of Utrecht" />
+        <div class="ndvi-legend" aria-label="NDVI value legend">
+          <h4>Value</h4>
+          <div class="ndvi-scale">
+            <span class="ndvi-gradient"></span>
+            <div class="ndvi-labels">
+              <span>1</span>
+              <span>-1</span>
+            </div>
+          </div>
+        </div>
+        <div class="map-scale-bar" aria-label="Map scale bar"><div class="map-scale-track"><span class="map-scale-seg"></span><span class="map-scale-seg map-scale-seg-light"></span></div><div class="map-scale-labels"><span>0</span><span>500 m</span></div></div>
+      </div>
+
+      <div class="content-card map-overview-tab">
+        <h2>Map Overview</h2>
+        <p>This project calculates the Normalized Difference Vegetation Index (NDVI) for the Science Park, Utrecht area to assess vegetation health from satellite imagery. NDVI is a widely used remote sensing index that distinguishes healthy, dense vegetation from sparse vegetation or impervious surfaces based on how surfaces reflect visible and infrared light. The resulting map highlights clear contrast between agricultural land, green space, and the built environment, demonstrating how a simple spectral index can communicate environmental information effectively to a non-specialist audience such as urban planners or conservation researchers.</p>
+      </div>
+
+      <div class="feature-map-wrap secondary-map" id="landcover-map-object">
+        <h2 class="feature-map-title">Unsupervised Object Based Map of Utrecht</h2>
+        <img src="Screenshot 2026-06-24 173550.jpeg" alt="Unsupervised object based land cover map of Utrecht" />
+        <div class="landcover-legend" aria-label="Land cover legend">
+          <h4>Class_name</h4>
+          <div class="landcover-legend-item"><span class="landcover-swatch" style="background:#9d2f3a;"></span><span>water</span></div>
+          <div class="landcover-legend-item"><span class="landcover-swatch" style="background:#b04a80;"></span><span>clouds</span></div>
+          <div class="landcover-legend-item"><span class="landcover-swatch" style="background:#d8cfb2;"></span><span>open field</span></div>
+          <div class="landcover-legend-item"><span class="landcover-swatch" style="background:#918763;"></span><span>urban</span></div>
+          <div class="landcover-legend-item"><span class="landcover-swatch" style="background:#2f6b14;"></span><span>agriculture</span></div>
+        </div>
+        <div class="map-scale-bar" aria-label="Map scale bar"><div class="map-scale-track"><span class="map-scale-seg"></span><span class="map-scale-seg map-scale-seg-light"></span></div><div class="map-scale-labels"><span>0</span><span>500 m</span></div></div>
+      </div>
+
+      <div class="feature-map-wrap secondary-map" id="landcover-map-pixel-unsup">
+        <h2 class="feature-map-title">Unsupervised Pixel Based Map of Utrecht</h2>
+        <img src="Screenshot 2026-06-24 173144.jpeg" alt="Unsupervised pixel based land cover map of Utrecht" />
+        <div class="landcover-legend" aria-label="Pixel based land cover legend">
+          <h4>Class_name</h4>
+          <div class="landcover-legend-item"><span class="landcover-swatch" style="background:#f06a05;"></span><span>urban</span></div>
+          <div class="landcover-legend-item"><span class="landcover-swatch" style="background:#be1e9a;"></span><span>water</span></div>
+          <div class="landcover-legend-item"><span class="landcover-swatch" style="background:#44d1bb;"></span><span>open field</span></div>
+          <div class="landcover-legend-item"><span class="landcover-swatch" style="background:#2bd91f;"></span><span>agriculture</span></div>
+        </div>
+        <div class="map-scale-bar" aria-label="Map scale bar"><div class="map-scale-track"><span class="map-scale-seg"></span><span class="map-scale-seg map-scale-seg-light"></span></div><div class="map-scale-labels"><span>0</span><span>500 m</span></div></div>
+      </div>
+
+      <div class="feature-map-wrap secondary-map" id="landcover-map-pixel-sup">
+        <h2 class="feature-map-title">Supervised Pixel Based Map of Utrecht</h2>
+        <img src="Screenshot 2026-06-24 174121.jpeg" alt="Supervised pixel based land cover map of Utrecht" />
+        <div class="landcover-legend" aria-label="Supervised pixel based land cover legend">
+          <h4>Class_name</h4>
+          <div class="landcover-legend-item"><span class="landcover-swatch" style="background:#5d80b2;"></span><span>Water</span></div>
+          <div class="landcover-legend-item"><span class="landcover-swatch" style="background:#e7d9df;"></span><span>Developed</span></div>
+          <div class="landcover-legend-item"><span class="landcover-swatch" style="background:#95c85e;"></span><span>Open Field</span></div>
+          <div class="landcover-legend-item"><span class="landcover-swatch" style="background:#7a2aa0;"></span><span>Agriculture</span></div>
+        </div>
+        <div class="map-scale-bar" aria-label="Map scale bar"><div class="map-scale-track"><span class="map-scale-seg"></span><span class="map-scale-seg map-scale-seg-light"></span></div><div class="map-scale-labels"><span>0</span><span>500 m</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <section>
+    <div class="container">
+      <div class="content-grid">
+        <div>
+          <div class="content-card">
+            <h2>Project Overview</h2>
+            <p>This project compares three approaches to classifying land cover from Sentinel satellite imagery of Science Park, Utrecht: unsupervised pixel-based, unsupervised object-based, and supervised pixel-based classification. The goal was to evaluate how the choice of classification method affects the accuracy and interpretability of land cover maps used in environmental monitoring. Each method distinguishes categories such as water, urban, agriculture, and open field, but with notably different levels of accuracy. The supervised approach, trained on hand-digitized samples, produced the most realistic and reliable result, while the unsupervised methods revealed common pitfalls, such as mislabeled clusters and spurious classes. This project demonstrates a practical understanding of how classification method choice directly affects map reliability for real-world environmental applications.</p>
+          </div>
+
+          <div class="content-card">
+            <h2>Methods</h2>
+            <p>I used ArcGIS Pro to classify Sentinel satellite imagery of Science Park, Utrecht. After loading the multiband image and adjusting band combinations for visual interpretation, I measured pixel size with the measure tool and generated a spectral profile across multiple land cover types to compare their reflectance signatures. For the unsupervised classifications, I used the Image Classification Wizard to run both pixel-based and object-based clustering, allowing the algorithm to group pixels by spectral similarity before manually relabeling each cluster. For the supervised classification, I digitized training samples for each land cover class, generated a signature file using the Create Signatures tool, and classified the image using a Support Vector Machine. To calculate NDVI, I used the Raster Functions tool, selecting the appropriate visible and infrared bands and applying a green-to-orange color scheme to represent vegetation health. Accuracy assessment via a confusion matrix is planned using ground-truth points to compare classified results against known land cover values.</p>
+          </div>
+        </div>
+
+        <div>
+          <div class="sidebar-card">
+            <h3>Project Details</h3>
+            <p><strong>Student:</strong> Eva Eicker-Harris</p>
+            <p><strong>Instructor:</strong> dr. Britta Ricker</p>
+            <p><strong>Date:</strong> June 2026</p>
+            <p><strong>Study Area:</strong> Science Park, Utrecht, Netherlands</p>
+          </div>
+
+          <div class="sidebar-card">
+            <h3>Software & Tools</h3>
+            <p>ArcGIS Pro</p>
+          </div>
+
+          <div class="sidebar-card">
+            <h3>Downloads</h3>
+            <div class="downloads-list">
+              <a href="ndvi-vegetation-health-map-of-utrecht.pdf" download="ndvi-vegetation-health-map-of-utrecht.pdf" class="button" data-export-target="#landcover-map-ndvi" data-export-filename="ndvi-vegetation-health-map-of-utrecht.pdf">Download NDVI Map PDF</a>
+              <a href="unsupervised-object-based-map-of-utrecht.pdf" download="unsupervised-object-based-map-of-utrecht.pdf" class="button" data-export-target="#landcover-map-object" data-export-filename="unsupervised-object-based-map-of-utrecht.pdf">Download Object-Based Map PDF</a>
+              <a href="unsupervised-pixel-based-map-of-utrecht.pdf" download="unsupervised-pixel-based-map-of-utrecht.pdf" class="button" data-export-target="#landcover-map-pixel-unsup" data-export-filename="unsupervised-pixel-based-map-of-utrecht.pdf">Download Pixel-Based Map PDF</a>
+              <a href="supervised-pixel-based-map-of-utrecht.pdf" download="supervised-pixel-based-map-of-utrecht.pdf" class="button" data-export-target="#landcover-map-pixel-sup" data-export-filename="supervised-pixel-based-map-of-utrecht.pdf">Download Supervised Map PDF</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="certificate-panel">
+    <div class="container">
+      <div class="feature-map-wrap certificate-wrap">
+        <h2 class="feature-map-title">ArcGIS Pro Training Certificate</h2>
+        <img src="esri-supervised-certificate.png" alt="Esri certificate for supervised pixel-based image classification" class="certificate-image" />
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">© 2026 GIS Student Portfolio</div>
+  </footer>
+  <script src="vendor/html2canvas.min.js"></script>
+  <script src="vendor/jspdf.umd.min.js"></script>
+  <script src="map-export.js"></script>
+</body>
+</html>

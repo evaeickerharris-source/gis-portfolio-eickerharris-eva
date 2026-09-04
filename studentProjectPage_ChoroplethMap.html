@@ -1,0 +1,675 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title>Choropleth Map</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+
+    :root{
+      --bg:#f4f1e8;
+      --surface:#f4e2c4;
+      --text:#191919;
+      --muted:#604027;
+      --accent:#6d682c;
+      --accent-light:#ebe2a7;
+      --border:#e5e7eb;
+      --shadow:0 10px 28px rgba(0,0,0,0.06);
+      --radius:20px;
+      --max-width:1240px;
+    }
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+    }
+
+    html{
+      scroll-behavior:smooth;
+    }
+
+    body{
+      font-family:'Inter',sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      line-height:1.8;
+    }
+
+    img{
+      max-width:100%;
+      display:block;
+    }
+
+    a{
+      text-decoration:none;
+      color:var(--accent);
+    }
+
+    .container{
+      width:min(92%, var(--max-width));
+      margin:auto;
+    }
+
+    /* =========================
+       HEADER
+    ========================== */
+
+    header{
+      position:sticky;
+      top:0;
+      z-index:1000;
+      background:rgba(244,226,196,0.9);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--border);
+    }
+
+    nav{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:1rem 0;
+    }
+
+    .logo{
+      font-weight:700;
+      font-size:1.05rem;
+    }
+
+    .back-link{
+      color:var(--muted);
+      transition:0.2s ease;
+    }
+
+    .back-link:hover{
+      color:var(--accent);
+    }
+
+    /* =========================
+       HERO
+    ========================== */
+
+    .hero{
+      padding:6rem 0 4rem;
+    }
+
+    .hero h1{
+      font-family:'Merriweather',serif;
+      font-size:clamp(2.4rem,6vw,4.5rem);
+      line-height:1.15;
+      margin-bottom:1.3rem;
+    }
+
+    .hero p{
+      color:var(--muted);
+      max-width:800px;
+      font-size:1.1rem;
+    }
+
+    .hero-meta{
+      margin-top:2rem;
+      display:flex;
+      flex-wrap:wrap;
+      gap:1rem;
+    }
+
+    .meta-item{
+      background:var(--accent-light);
+      color:var(--accent);
+      padding:0.6rem 1rem;
+      border-radius:999px;
+      font-size:0.92rem;
+      font-weight:500;
+    }
+
+    /* =========================
+       FEATURE IMAGE
+    ========================== */
+
+    .feature-image{
+      display:block;
+      margin-bottom:5rem;
+    }
+
+    .feature-image img{
+      width:100%;
+      height:100%;
+      display:block;
+      object-fit:cover;
+      background:#f4f1e8;
+      border-radius:var(--radius);
+      border:1px solid var(--border);
+      box-shadow:var(--shadow);
+    }
+
+    .feature-image-frame{
+      width:100%;
+      aspect-ratio:1755 / 1240;
+      border-radius:var(--radius);
+      overflow:hidden;
+      background:#f4f1e8;
+      position:relative;
+    }
+
+    .feature-image-placeholder{
+      min-height:500px;
+      background:linear-gradient(
+        135deg,
+        #ebe2a7,
+        #f4e2c4
+      );
+      border-radius:var(--radius);
+      border:1px solid var(--border);
+      box-shadow:var(--shadow);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#604027;
+      font-size:1.1rem;
+      font-weight:600;
+      text-align:center;
+      padding:1.2rem;
+    }
+
+    #interactive-map{
+      width:100%;
+      height:620px;
+      border-radius:var(--radius);
+      border:1px solid var(--border);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+
+    .interactive-map-wrap{
+      margin-bottom:6rem;
+    }
+
+    .map-title-banner{
+      display:block;
+      width:100%;
+      margin-bottom:0;
+      padding:0.58rem 1rem;
+      border-radius:var(--radius) var(--radius) 0 0;
+      background:rgba(244,241,232,0.92);
+      border:1px solid #d1d5db;
+      border-bottom:none;
+      box-shadow:0 3px 10px rgba(0,0,0,0.08);
+      color:var(--text);
+      font-weight:600;
+      letter-spacing:0;
+      text-transform:none;
+      font-size:clamp(0.8rem,1.35vw,1.22rem);
+      line-height:1.2;
+      text-align:center;
+    }
+
+    .interactive-map-frame{
+      width:100%;
+      height:620px;
+      border:1px solid var(--border);
+      border-top:none;
+      border-radius:0 0 var(--radius) var(--radius);
+      box-shadow:var(--shadow);
+      display:block;
+    }
+
+    .interactive-map-shell{
+      position:relative;
+      width:100%;
+    }
+
+    .map-scale-bar{
+      position:absolute;
+      right:1rem;
+      bottom:1rem;
+      z-index:4;
+      background:rgba(244,241,232,0.95);
+      border:1px solid #9ca3af;
+      border-radius:8px;
+      padding:0.42rem 0.5rem;
+      box-shadow:0 6px 18px rgba(0,0,0,0.12);
+    }
+
+    .map-scale-track{display:flex;width:110px;height:10px;border:1px solid rgba(0,0,0,0.22);border-radius:2px;overflow:hidden;}
+    .map-scale-seg{flex:1;background:#2f2f2f;}
+    .map-scale-seg-light{background:#f3f4f6;}
+    .map-scale-labels{display:flex;justify-content:space-between;color:#374151;font-size:0.78rem;font-weight:700;line-height:1;margin-top:0.28rem;}
+
+    .map-embed-help{
+      margin-top:1rem;
+      padding:0.9rem 1rem;
+      border-radius:12px;
+      border:1px dashed var(--border);
+      color:var(--muted);
+      background:rgba(244,226,196,0.45);
+      font-size:0.93rem;
+      line-height:1.6;
+    }
+
+    .map-info{
+      padding:8px 10px;
+      font:14px/16px 'Inter',sans-serif;
+      color:var(--text);
+      background:rgba(244,241,232,0.95);
+      border:1px solid var(--border);
+      border-radius:10px;
+      box-shadow:0 6px 18px rgba(0,0,0,0.12);
+    }
+
+    .map-info h4{
+      margin:0 0 6px;
+      color:var(--muted);
+      font-weight:600;
+      font-size:0.92rem;
+      line-height:1.3;
+    }
+
+    .map-legend{
+      line-height:1.25;
+      color:var(--text);
+    }
+
+    .map-legend i{
+      width:16px;
+      height:16px;
+      float:left;
+      margin-right:8px;
+      opacity:0.8;
+      border:1px solid rgba(0,0,0,0.1);
+    }
+
+    /* =========================
+       CONTENT
+    ========================== */
+
+    section{
+      padding-bottom:4rem;
+    }
+
+    .content-grid{
+      display:grid;
+      grid-template-columns:2fr 1fr;
+      gap:3rem;
+      align-items:start;
+    }
+
+    .content-card{
+      background:var(--surface);
+      border-radius:var(--radius);
+      padding:2.2rem;
+      border:1px solid var(--border);
+      box-shadow:var(--shadow);
+      margin-bottom:2rem;
+    }
+
+    .content-card h2{
+      font-family:'Merriweather',serif;
+      margin-bottom:1rem;
+      font-size:1.6rem;
+    }
+
+    .content-card p{
+      color:var(--muted);
+      margin-bottom:1.2rem;
+    }
+
+    .content-card ul{
+      padding-left:1.2rem;
+      color:var(--muted);
+    }
+
+    /* =========================
+       SIDEBAR
+    ========================== */
+
+    .sidebar-card{
+      background:var(--surface);
+      border-radius:var(--radius);
+      padding:2rem;
+      border:1px solid var(--border);
+      box-shadow:var(--shadow);
+      margin-bottom:2rem;
+    }
+
+    .sidebar-card h3{
+      margin-bottom:1rem;
+      font-size:1.1rem;
+    }
+
+    .sidebar-card p{
+      color:var(--muted);
+      margin-bottom:0.7rem;
+      font-size:0.95rem;
+    }
+
+    /* =========================
+       GALLERY
+    ========================== */
+
+    .gallery{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:1.5rem;
+      margin-top:2rem;
+    }
+
+    .gallery-item{
+      height:180px;
+      border-radius:16px;
+      background:linear-gradient(
+        135deg,
+        #ebe2a7,
+        #f4e2c4
+      );
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#604027;
+      font-weight:600;
+      border:1px solid var(--border);
+    }
+
+    /* =========================
+       BUTTON
+    ========================== */
+
+    .button{
+      display:inline-block;
+      margin-top:1rem;
+      padding:0.95rem 1.4rem;
+      border-radius:999px;
+      background:#7b7729;
+      color:#ffffff;
+      font-weight:600;
+      transition:0.2s ease;
+    }
+
+    .button:hover{
+      background:#676220;
+    }
+
+    /* =========================
+       FOOTER
+    ========================== */
+
+    footer{
+      padding:4rem 0;
+      text-align:center;
+      color:var(--muted);
+      font-size:0.95rem;
+    }
+
+    /* =========================
+       MOBILE
+    ========================== */
+
+    @media(max-width:900px){
+
+      .content-grid{
+        grid-template-columns:1fr;
+      }
+
+      .feature-image{
+        margin-bottom:4rem;
+      }
+
+      .feature-image-placeholder{
+        min-height:320px;
+      }
+
+      .feature-image-frame{
+        aspect-ratio:1755 / 1240;
+      }
+
+      #interactive-map{
+        height:420px;
+      }
+
+      .interactive-map-wrap{
+        margin-bottom:4.5rem;
+      }
+
+      nav{
+        flex-direction:column;
+        gap:1rem;
+      }
+
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- =========================
+       HEADER
+  ========================== -->
+
+  <header>
+
+    <div class="container">
+
+      <nav>
+
+        <div class="logo">
+          GIS Student Portfolio
+        </div>
+
+        <a href="Student_website_template.html" class="back-link">
+          ← Back to Portfolio
+        </a>
+
+      </nav>
+
+    </div>
+
+  </header>
+
+  <!-- =========================
+       HERO
+  ========================== -->
+
+  <section class="hero">
+
+    <div class="container">
+
+      <h1>
+        Choropleth Map
+      </h1>
+
+      <p>
+        A map showing the global proportion of women in national parliaments to visualize progress toward political gender equality (SDG 5).
+      </p>
+
+      <div class="hero-meta">
+
+        <div class="meta-item">
+          QGIS
+        </div>
+
+        <div class="meta-item">
+          Cartography
+        </div>
+
+        <div class="meta-item">
+          Spatial Analysis
+        </div>
+
+        <div class="meta-item">
+          JavaScript
+        </div>
+
+        <div class="meta-item">
+          GeoJSON
+        </div>
+
+        <div class="meta-item">
+          MapLibre GL
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- =========================
+       FEATURE IMAGE
+  ========================== -->
+
+  <div class="container">
+
+    <div class="feature-image">
+      <div class="feature-image-frame" id="choropleth-static-map">
+        <img src="choropleth-map-women-in-parliament.png" alt="Choropleth map visualization showing women in national parliaments" />
+        <div class="map-scale-bar" aria-label="Map scale bar"><div class="map-scale-track"><span class="map-scale-seg"></span><span class="map-scale-seg map-scale-seg-light"></span></div><div class="map-scale-labels"><span>0</span><span>3000 km</span></div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="container interactive-map-wrap">
+
+    <div class="map-title-banner">Interactive Map</div>
+
+    <!-- =====================================================
+         INTERACTIVE MAP — iframe embed
+         To swap in a new map: just change the src filename.
+    ====================================================== -->
+    <div class="interactive-map-shell">
+      <iframe
+        class="interactive-map-frame"
+        src="choropleth-interactive-map.html"
+        title="Interactive choropleth map: women in parliament"
+      ></iframe>
+    </div>
+
+  </div>
+
+  <!-- =========================
+       MAIN CONTENT
+  ========================== -->
+
+  <section>
+
+    <div class="container">
+
+      <div class="content-grid">
+
+        <!-- LEFT CONTENT -->
+        <div>
+
+          <!-- PROJECT OVERVIEW -->
+          <div class="content-card">
+
+            <h2>Project Overview</h2>
+
+            <p>
+              This project maps SDG Indicator 5.5.1, the proportion of seats held by women in national parliaments, using 2020 data across UN member states. The goal was to visualize global patterns in political gender equality in a way that is immediately understandable to a general, non-specialist audience.
+            </p>
+
+            <p>
+              Choropleth maps are well suited to this kind of comparison, since they let viewers spot regional patterns and outliers, such as Rwanda's unusually high representation, at a single glance without needing to read through tables of numbers.
+            </p>
+
+          </div>
+
+          <!-- METHODS -->
+          <div class="content-card">
+
+            <h2>Methods</h2>
+
+            <p>
+              I began in QGIS by joining the SDG 5.5.1 dataset to a world country shapefile, using field calculations to clean and prepare the attribute data.
+            </p>
+
+            <p>
+              I then applied a classification scheme to group countries into meaningful percentage ranges and styled the map using a sequential green colour ramp, with grey representing countries with missing data. After finalizing the design and layout in QGIS, including labels for notable outliers, I exported the data as GeoJSON and built an interactive web version using HTML, CSS, and JavaScript with MapLibre GL.
+            </p>
+
+            <p>
+              Hover tooltips were added so users can explore the data interactively rather than viewing a static image.
+            </p>
+
+          </div>
+
+        </div>
+
+        <!-- SIDEBAR -->
+        <div>
+
+          <!-- PROJECT DETAILS -->
+          <div class="sidebar-card">
+
+            <h3>Project Details</h3>
+
+            <p><strong>Student:</strong> Eva Eicker-Harris</p>
+
+            <p><strong>Instructor:</strong> dr. Britta Ricker</p>
+
+            <p><strong>Date:</strong> June 2026</p>
+
+            <p><strong>Study Area:</strong> Global — all UN member states with available 2020 data.</p>
+
+          </div>
+
+          <!-- SOFTWARE -->
+          <div class="sidebar-card">
+
+            <h3>Software & Tools</h3>
+
+            <p>QGIS</p>
+
+            <p>MapLibre GL</p>
+
+          </div>
+
+          <!-- DOWNLOADS -->
+          <div class="sidebar-card">
+
+            <h3>Downloads</h3>
+
+            <a href="choropleth-map-women-in-parliament.pdf" download="choropleth-map-women-in-parliament.pdf" class="button" data-export-target="#choropleth-static-map" data-export-filename="choropleth-map-women-in-parliament.pdf">
+              Download Map PDF
+            </a>
+
+            <br><br>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- =========================
+       FOOTER
+  ========================== -->
+
+  <footer>
+
+    <div class="container">
+
+      © 2026 GIS Student Portfolio
+
+    </div>
+
+  </footer>
+
+  <script src="vendor/html2canvas.min.js"></script>
+  <script src="vendor/jspdf.umd.min.js"></script>
+  <script src="map-export.js"></script>
+
+</body>
+</html>

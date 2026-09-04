@@ -1,0 +1,607 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title>Vector Analysis</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+
+    :root{
+      --bg:#f4f1e8;
+      --surface:#f4e2c4;
+      --text:#191919;
+      --muted:#604027;
+      --accent:#6d682c;
+      --accent-light:#ebe2a7;
+      --border:#e5e7eb;
+      --shadow:0 10px 28px rgba(0,0,0,0.06);
+      --radius:20px;
+      --max-width:1240px;
+    }
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+    }
+
+    html{
+      scroll-behavior:smooth;
+    }
+
+    body{
+      font-family:'Inter',sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      line-height:1.8;
+    }
+
+    img{
+      max-width:100%;
+      display:block;
+    }
+
+    a{
+      text-decoration:none;
+      color:var(--accent);
+    }
+
+    .container{
+      width:min(92%, var(--max-width));
+      margin:auto;
+    }
+
+    /* =========================
+       HEADER
+    ========================== */
+
+    header{
+      position:sticky;
+      top:0;
+      z-index:1000;
+      background:rgba(244,226,196,0.9);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--border);
+    }
+
+    nav{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:1rem 0;
+    }
+
+    .logo{
+      font-weight:700;
+      font-size:1.05rem;
+    }
+
+    .back-link{
+      color:var(--muted);
+      transition:0.2s ease;
+    }
+
+    .back-link:hover{
+      color:var(--accent);
+    }
+
+    /* =========================
+       HERO
+    ========================== */
+
+    .hero{
+      padding:6rem 0 4rem;
+    }
+
+    .hero h1{
+      font-family:'Merriweather',serif;
+      font-size:clamp(2.4rem,6vw,4.5rem);
+      line-height:1.15;
+      margin-bottom:1.3rem;
+    }
+
+    .hero p{
+      color:var(--muted);
+      max-width:800px;
+      font-size:1.1rem;
+    }
+
+    .hero-meta{
+      margin-top:2rem;
+      display:flex;
+      flex-wrap:wrap;
+      gap:1rem;
+    }
+
+    .meta-item{
+      background:var(--accent-light);
+      color:var(--accent);
+      padding:0.6rem 1rem;
+      border-radius:999px;
+      font-size:0.92rem;
+      font-weight:500;
+    }
+
+    /* =========================
+       FEATURE IMAGE
+    ========================== */
+
+    .feature-image{
+      margin-bottom:5rem;
+    }
+
+    .feature-map-title{
+      font-family:'Merriweather',serif;
+      font-size:clamp(0.8rem,1.35vw,1.22rem);
+      line-height:1.2;
+      margin:0;
+      color:var(--text);
+      white-space:nowrap;
+      position:absolute;
+      top:0;
+      left:0;
+      right:0;
+      z-index:3;
+      text-align:center;
+      background:rgba(244,241,232,0.92);
+      border:1px solid #d1d5db;
+      padding:0.58rem 1rem;
+      box-shadow:0 3px 10px rgba(0,0,0,0.08);
+    }
+
+    .feature-map-wrap{
+      position:relative;
+      border-radius:var(--radius);
+      overflow:hidden;
+      border:1px solid var(--border);
+      box-shadow:var(--shadow);
+      background:#f4f1e8;
+    }
+
+    .feature-map-wrap img{
+      width:100%;
+      height:auto;
+      display:block;
+    }
+
+    .isochrone-legend{
+      position:absolute;
+      left:1rem;
+      bottom:1rem;
+      background:rgba(244,241,232,0.95);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:0.65rem 0.75rem;
+      box-shadow:0 6px 18px rgba(0,0,0,0.12);
+      min-width:240px;
+    }
+
+    .isochrone-legend-item{
+      display:flex;
+      align-items:center;
+      gap:0.55rem;
+      color:#374151;
+      font-size:0.95rem;
+      font-weight:600;
+      margin:0.18rem 0;
+    }
+
+    .isochrone-swatch{
+      width:38px;
+      height:22px;
+      border-radius:4px;
+      border:1px solid rgba(0,0,0,0.08);
+      flex:0 0 auto;
+    }
+
+    .map-scale-bar{
+      position:absolute;
+      right:1rem;
+      bottom:1rem;
+      z-index:4;
+      background:rgba(244,241,232,0.95);
+      border:1px solid #9ca3af;
+      border-radius:8px;
+      padding:0.42rem 0.5rem;
+      box-shadow:0 6px 18px rgba(0,0,0,0.12);
+    }
+
+    .map-scale-track{
+      display:flex;
+      width:110px;
+      height:10px;
+      border:1px solid rgba(0,0,0,0.22);
+      border-radius:2px;
+      overflow:hidden;
+    }
+
+    .map-scale-seg{flex:1;background:#2f2f2f;}
+    .map-scale-seg-light{background:#f3f4f6;}
+
+    .map-scale-labels{
+      display:flex;
+      justify-content:space-between;
+      color:#374151;
+      font-size:0.78rem;
+      font-weight:700;
+      line-height:1;
+      margin-top:0.28rem;
+    }
+
+    /* =========================
+       CONTENT
+    ========================== */
+
+    section{
+      padding-bottom:4rem;
+    }
+
+    .content-grid{
+      display:grid;
+      grid-template-columns:2fr 1fr;
+      gap:3rem;
+      align-items:start;
+    }
+
+    .content-card{
+      background:var(--surface);
+      border-radius:var(--radius);
+      padding:2.2rem;
+      border:1px solid var(--border);
+      box-shadow:var(--shadow);
+      margin-bottom:2rem;
+    }
+
+    .content-card h2{
+      font-family:'Merriweather',serif;
+      margin-bottom:1rem;
+      font-size:1.6rem;
+    }
+
+    .content-card p{
+      color:var(--muted);
+      margin-bottom:1.2rem;
+    }
+
+    .content-card ul{
+      padding-left:1.2rem;
+      color:var(--muted);
+    }
+
+    /* =========================
+       SIDEBAR
+    ========================== */
+
+    .sidebar-card{
+      background:var(--surface);
+      border-radius:var(--radius);
+      padding:2rem;
+      border:1px solid var(--border);
+      box-shadow:var(--shadow);
+      margin-bottom:2rem;
+    }
+
+    .sidebar-card h3{
+      margin-bottom:1rem;
+      font-size:1.1rem;
+    }
+
+    .sidebar-card p{
+      color:var(--muted);
+      margin-bottom:0.7rem;
+      font-size:0.95rem;
+    }
+
+    /* =========================
+       GALLERY
+    ========================== */
+
+    .gallery{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:1.5rem;
+      margin-top:2rem;
+    }
+
+    .gallery-item{
+      height:180px;
+      border-radius:16px;
+      background:linear-gradient(
+        135deg,
+        #e0ecff,
+        #f5f9ff
+      );
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#64748b;
+      font-weight:600;
+      border:1px solid var(--border);
+    }
+
+    /* =========================
+       BUTTON
+    ========================== */
+
+    .button{
+      display:inline-block;
+      margin-top:1rem;
+      padding:0.95rem 1.4rem;
+      border-radius:999px;
+      background:var(--accent);
+      color:white;
+      font-weight:600;
+      transition:0.2s ease;
+    }
+
+    .button:hover{
+      opacity:0.92;
+    }
+
+    /* =========================
+       FOOTER
+    ========================== */
+
+    footer{
+      padding:4rem 0;
+      text-align:center;
+      color:var(--muted);
+      font-size:0.95rem;
+    }
+
+    /* =========================
+       MOBILE
+    ========================== */
+
+    @media(max-width:900px){
+
+      .content-grid{
+        grid-template-columns:1fr;
+      }
+
+      .feature-image{
+        margin-bottom:4rem;
+      }
+
+      .isochrone-legend{
+        position:static;
+        margin:0.8rem;
+        width:calc(100% - 1.6rem);
+        min-width:0;
+      }
+
+      .feature-map-title{
+        white-space:normal;
+        max-width:calc(100% - 1.6rem);
+      }
+
+      nav{
+        flex-direction:column;
+        gap:1rem;
+      }
+
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- =========================
+       HEADER
+  ========================== -->
+
+  <header>
+
+    <div class="container">
+
+      <nav>
+
+        <div class="logo">
+          GIS Student Portfolio
+        </div>
+
+        <a href="Student_website_template.html" class="back-link">
+          ← Back to Portfolio
+        </a>
+
+      </nav>
+
+    </div>
+
+  </header>
+
+  <!-- =========================
+       HERO
+  ========================== -->
+
+  <section class="hero">
+
+    <div class="container">
+
+      <h1>
+        Vector Analysis
+      </h1>
+
+      <p>
+        This project investigates how equitably recycling infrastructure is distributed across Munich by asking: how many homes are within a 5, 10, and 20-minute walk of a recycling point?
+      </p>
+
+      <div class="hero-meta">
+
+        <div class="meta-item">
+          QGIS
+        </div>
+
+        <div class="meta-item">
+          Spatial Analysis
+        </div>
+
+        <div class="meta-item">
+          Cartography
+        </div>
+
+        <div class="meta-item">
+          2026
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- =========================
+       FEATURE IMAGE
+  ========================== -->
+
+  <div class="container">
+
+    <div class="feature-image">
+
+      <div class="feature-map-wrap" id="vector-main-map">
+        <h2 class="feature-map-title">Walking Access to Recycling Points in Munich: 5, 10, and 20-Minute Isochrones</h2>
+        <img src="vector-map-preview.png" alt="Walking access to recycling points in Munich using 5, 10, and 20-minute isochrones" />
+
+        <div class="isochrone-legend" aria-label="Isochrone legend">
+          <div class="isochrone-legend-item">
+            <span class="isochrone-swatch" style="background:#008f4f;"></span>
+            <span>5-minute walking distance</span>
+          </div>
+          <div class="isochrone-legend-item">
+            <span class="isochrone-swatch" style="background:#2fb97b;"></span>
+            <span>10-minute walking distance</span>
+          </div>
+          <div class="isochrone-legend-item">
+            <span class="isochrone-swatch" style="background:#9ddf9a;"></span>
+            <span>20-minute walking distance</span>
+          </div>
+        </div>
+        <div class="map-scale-bar" aria-label="Map scale bar"><div class="map-scale-track"><span class="map-scale-seg"></span><span class="map-scale-seg map-scale-seg-light"></span></div><div class="map-scale-labels"><span>0</span><span>1 km</span></div></div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- =========================
+       MAIN CONTENT
+  ========================== -->
+
+  <section>
+
+    <div class="container">
+
+      <div class="content-grid">
+
+        <!-- LEFT CONTENT -->
+        <div>
+
+          <!-- PROJECT OVERVIEW -->
+          <div class="content-card">
+
+            <h2>Project Overview</h2>
+
+            <p>
+              This project investigates how equitably recycling infrastructure is distributed across Munich by asking: how many homes are within a 5, 10, and 20-minute walk of a recycling point? Convenient access to recycling points is a known driver of recycling participation, making this a meaningful, everyday sustainability question.
+            </p>
+
+            <p>
+              Using OpenStreetMap data and network-based isochrone analysis, this project moves beyond simple proximity to reflect how people actually move through a city, via real streets rather than straight-line distance, revealing where access is strong and where gaps remain.
+            </p>
+
+          </div>
+
+          <!-- METHODS -->
+          <div class="content-card">
+
+            <h2>Methods</h2>
+
+            <p>
+              I used the QuickOSM plugin in QGIS to download recycling point locations and building footprints for Munich directly from OpenStreetMap. Since isochrone analysis requires point data, I converted the building footprint polygons into points using the Centroid tool.
+            </p>
+
+            <p>
+              I then used ORS Tools to generate walking-time isochrones, 5, 10, and 20-minute service areas, around each recycling point, based on real street-network routing. Finally, I used the Count Points in Polygon tool to calculate how many building centroids fell within each isochrone ring, giving a measurable count of homes reachable within each time threshold.
+            </p>
+
+          </div>
+
+        </div>
+
+        <!-- SIDEBAR -->
+        <div>
+
+          <!-- PROJECT DETAILS -->
+          <div class="sidebar-card">
+
+            <h3>Project Details</h3>
+
+            <p><strong>Student:</strong> Eva Eicker-Harris</p>
+
+            <p><strong>Instructor:</strong> dr. Britta Ricker</p>
+
+            <p><strong>Date:</strong> June 2026</p>
+
+            <p><strong>Study Area:</strong> Munich, Germany</p>
+
+          </div>
+
+          <!-- SOFTWARE -->
+          <div class="sidebar-card">
+
+            <h3>Software & Tools</h3>
+
+            <p>QGIS</p>
+
+          </div>
+
+          <!-- DOWNLOADS -->
+          <div class="sidebar-card">
+
+            <h3>Downloads</h3>
+
+            <a href="vector-analysis-map.pdf" download="vector-analysis-map.pdf" class="button" data-export-target="#vector-main-map" data-export-filename="vector-analysis-map.pdf">
+              Download Map PDF
+            </a>
+
+            <br><br>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- =========================
+       FOOTER
+  ========================== -->
+
+  <footer>
+
+    <div class="container">
+
+      © 2026 GIS Student Portfolio
+
+    </div>
+
+  </footer>
+
+  <script src="vendor/html2canvas.min.js"></script>
+  <script src="vendor/jspdf.umd.min.js"></script>
+  <script src="map-export.js"></script>
+
+</body>
+</html>
